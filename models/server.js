@@ -22,8 +22,28 @@ class Server {
 
     routes() {
         this.app.get('/api', (req, res) => {
-            res.send('hola mundo');
-        })
+            res.status(200).json({
+                msg: 'get Succesfully'
+            });
+        });
+
+        this.app.put('/api', (req, res) => {
+            res.status(500).json({
+                msg: 'put succesfully'
+            })
+        });
+
+        this.app.post('/api', (req, res) => {
+            res.status(201).json({
+                msg: 'post succesfully'
+            })
+        });
+
+        this.app.delete('/api', (req, res) => {
+            res.status(200).json({
+                msg: 'delete succesfully'
+            })
+        });
     }
 
     listen() {
