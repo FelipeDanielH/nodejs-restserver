@@ -5,10 +5,10 @@ require('dotenv').config();
 
 
 class Server {
-
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
+        this.usuariosPath = '/api/usuarios';
 
         // Middlewares
         this.middlewares();
@@ -21,34 +21,15 @@ class Server {
         // CORS
         this.app.use( cors() );
 
+        // Parseo del body
+        this.app.use( express.json() );
+
         // Directorio publico
         this.app.use( express.static('public') );
     }
 
     routes() {
-        this.app.get('/api', (req, res) => {
-            res.status(200).json({
-                msg: 'get Succesfully'
-            });
-        });
-
-        this.app.put('/api', (req, res) => {
-            res.status(500).json({
-                msg: 'put succesfully'
-            })
-        });
-
-        this.app.post('/api', (req, res) => {
-            res.status(201).json({
-                msg: 'post succesfully'
-            })
-        });
-
-        this.app.delete('/api', (req, res) => {
-            res.status(200).json({
-                msg: 'delete succesfully'
-            })
-        });
+        this.app.use( this.usuariosPath, require('../routes/user'));
     }
 
     listen() {
