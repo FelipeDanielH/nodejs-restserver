@@ -2,11 +2,13 @@ const { request, response } = require('express')
 
 const usuariosGet = (req = request, res = response) => {
 
-    const { q = '',
+    const { 
+        q = '',
         nombre = '',
-        apikey = '',
+        apiKey = '',
         page = '',
-        limit = '' } = req.query;
+        limit = '' 
+    } = req.query;
 
     res.status(200).json({
         msg: 'get Succesfully - controlador',
