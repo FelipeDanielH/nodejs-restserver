@@ -1,4 +1,6 @@
-const { request, response } = require('express')
+const { request, response } = require('express');
+const Usuario = require('../models/usuario');
+
 
 const usuariosGet = (req = request, res = response) => {
 
@@ -18,14 +20,15 @@ const usuariosGet = (req = request, res = response) => {
     });
 }
 
-const usuraiosPost = (req, res) => {
+const usuariosPost = async (req, res) => {
 
-    const { nombre, edad } = req.body;
+    const body = req.body;
+    const usuario = new  Usuario( body );
 
-    res.status(201).json({
-        msg: 'post succesfully - controlador',
-        nombre,
-        edad
+    await usuario.save();
+
+    res.status(200).json({
+        usuario
     });
 }
 
@@ -53,7 +56,7 @@ const usuariosDelete = (req, res) => {
 
 module.exports = {
     usuariosGet,
-    usuraiosPost,
+    usuariosPost,
     usuariosPut,
     usuariosPatch,
     usuariosDelete
