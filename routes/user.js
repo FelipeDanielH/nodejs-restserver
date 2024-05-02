@@ -14,6 +14,7 @@ router.patch('/', usuariosPatch);
 
 router.post('/', [
     check('correo', 'El correo no es valido').isEmail(),
+    check('correo').custom( (correo) => emailExiste(correo) ),
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('password', 'La contraseña debe tener mas de 6 letras').isLength({min: 6}),
     // check('rol', 'No es un rol valido').isIn(['ADMIN_ROLE', 'USER_ROLE']),
