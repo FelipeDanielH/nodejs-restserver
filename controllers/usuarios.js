@@ -5,22 +5,25 @@ const bcryptjs = require('bcryptjs');
 const Usuario = require('../models/usuario');
 
 
-const usuariosGet = (req = request, res = response) => {
+const usuariosGet = async (req = request, res = response) => {
 
-    const {
+   /*  const {
         q = '',
         nombre = '',
         apiKey = '',
         page = '',
         limit = ''
-    } = req.query;
+    } = req.query; */
 
-    res.status(200).json({
-        msg: 'get Succesfully - controlador',
-        q,
-        nombre,
-        apiKey
-    });
+    const { limite = 2, desde = 0 } = req.query;
+
+    const usuarios = await Usuario.find()
+    .skip( Number(desde) )
+    .limit(Number(limite))
+
+    res.json({
+        usuarios
+    })
 }
 
 const usuariosPost = async (req, res) => {
@@ -40,13 +43,21 @@ const usuariosPost = async (req, res) => {
     });
 }
 
-const usuariosPut = (req, res) => {
+const usuariosPut = async (req, res) => {
 
     const { id } = req.params;
+    const { _id, password, google, correo, ...body } = req.body;
+
+    if( password ){
+        const salt = bcryptjs.genSaltSync();
+        body.password = bcryptjs.hashSync( password, salt );
+    }
+
+    const usuario = await Usuario.findByIdAndUpdate( id, body );
 
     res.status(500).json({
         msg: 'put succesfully - controlador',
-        id
+        usuario
     });
 }
 
