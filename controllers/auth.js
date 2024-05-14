@@ -15,7 +15,6 @@ const login = async (req, res = response) => {
                 msg: 'Bad Request - correo incorrecto'
             });
         }
-       
 
         //  Verificar si el usuario esta activo
         if(!usuario.estado){

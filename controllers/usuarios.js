@@ -81,8 +81,7 @@ const usuariosDelete = async (req, res) => {
     const usuarioAutenticado = req.usuario;
 
     res.status(200).json({
-        usuario,
-        usuarioAutenticado
+        usuario
     });
 }
 

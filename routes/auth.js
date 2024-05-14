@@ -10,7 +10,7 @@ const router = Router();
 router.post('/login',[
     check('correo', 'No es un correo valido').isEmail(),
     check('password', 'La contraseña es obligatoria').not().isEmpty(),
-    validarCampos
+    validarCampos 
 ], login );
 
 module.exports = router;
