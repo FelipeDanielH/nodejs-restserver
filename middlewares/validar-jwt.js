@@ -1,7 +1,6 @@
 const { response } = require('express');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/usuario');
-const { cookie } = require('express-validator');
 
 const validarJWT = async (req, res = response, next) => {
     // Obtiene el token de los headers
@@ -16,14 +15,14 @@ const validarJWT = async (req, res = response, next) => {
     try {
         const { uid } = jwt.verify(token, process.env.SECRET);
 
+        // lee el usuario segun el uid obtenido del header
+        const usuario = await Usuario.findById(uid)
+
         if (!usuario) {
             return res.status(401).json({
                 msg: 'Token no valido - usuario no existe en la bd'
             })
         }
-
-        // lee el usuario segun el uid obtenido del header
-        const usuario = await Usuario.findById(uid)
 
         // verificar si el usuario esta activo
         if (!usuario.estado) {
