@@ -3,9 +3,7 @@ const { esRolValido, emailExiste, existeUsuarioPorId } = require('../helpers/db-
 const { Router } = require('express');
 const { usuariosGet, usuariosPut, usuariosPatch, usuariosPost, usuariosDelete } = require('../controllers/usuarios');
 
-const { esAdminRole, tieneRole } = require('../middlewares/validar-roles');
-const { validarCampos } = require('../middlewares/validarCampos');
-const { validarJWT } = require('../middlewares/validar-jwt');
+const { validarCampos, validarJWT, tieneRole } = require('../middlewares')
 
 const router = Router();
 
