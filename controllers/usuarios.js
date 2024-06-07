@@ -2,6 +2,7 @@ const { request, response } = require('express');
 const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../models/usuario');
+const usuario = require('../models/usuario');
 
 const usuariosGet = async (req = request, res = response) => {
 
@@ -12,7 +13,6 @@ const usuariosGet = async (req = request, res = response) => {
     /* const usuarios = await Usuario.find(query)
         .skip(Number(desde))
         .limit(Number(limite))
-
     const total = await Usuario.countDocuments(query); */
 
     const [ total, usuarios] = await Promise.all([
@@ -22,9 +22,26 @@ const usuariosGet = async (req = request, res = response) => {
             .limit(Number(limite))
     ])
 
+    const datos = usuarios.map( usuario => {
+        let {nombre, _id:uid} =  usuario
+        return {nombre, uid}
+    })
+
     res.json({
         total,
-        usuarios
+        datos
+    })
+}
+
+const usuarioGet = async (req = request, res = response) => {
+    const {id} = req.params;
+
+    const usuario = await Usuario.findOne( {_id:id});
+
+    if(!usuario) return
+
+    res.json({
+        usuario
     })
 }
 
@@ -57,7 +74,7 @@ const usuariosPut = async (req, res) => {
 
     const usuario = await Usuario.findByIdAndUpdate(id, body);
 
-    res.status(500).json({
+    res.status(200).json({
         msg: 'put succesfully - controlador',
         usuario
     });
@@ -87,6 +104,7 @@ const usuariosDelete = async (req, res) => {
 
 module.exports = {
     usuariosGet,
+    usuarioGet,
     usuariosPost,
     usuariosPut,
     usuariosPatch,

@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const { dbConnection } = require('../database/config');
 
+const { swaggerDocs } = require("../api/swaggerConfig");
+
 require('dotenv').config();
 
 
@@ -47,6 +49,7 @@ class Server {
     listen() {
         this.app.listen(this.port, () => {
             console.log('Servidor corriendo en puerto: ', this.port);
+            swaggerDocs(this.app, this.port)
         });
     }
 }
