@@ -1,0 +1,223 @@
+openapi: 3.0.3
+info:
+  title: API REST Simple
+  description: |-
+
+    ## Importante:
+
+    ### Antes de realizar cualquier accion, primero realizar una peticion POST a la **ruta 'auth/login'** mas abajo
+
+    #### Datos necesarios dentro del cuerpo de la peticion (ejemplo):
+
+    ```json
+    {
+      "nombre":"usuariotest@test.com"
+      "password":"simpletest"
+    }
+    ```
+
+    ### Una vez obtenido el token en la respuesta. introducirlo clickeando en el boton **'Authorize'**
+
+    #### Disfruta las consultas 
+
+
+
+    link de google:
+    [google](https://www.google.cl)
+  contact:
+    email: felipe.daniel.henriquez@gmail.com
+  version: 3.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8080/api
+tags:
+  - name: Usuarios
+    description: operaciones crud con usuarios (limitado al rol)
+  - name: Auth
+    description: Login simple
+paths:
+  /usuarios/{id}:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtiene informacion del usuario con su id
+      description: solo accesible si el usuario esta logeado
+      operationId: usuarioGet
+      parameters:
+        - name: id
+          in: path
+          description: 'id del usuario'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario' 
+        '400':
+          description: Invalid username supplied
+        '404':
+          description: User not found
+      security:
+        - api_key: []
+    put:
+      tags:
+        - Usuarios
+      summary: Actualiza la informacion de un usuario
+      description: Debe recibir un usuario en el body
+      operationId: usuariosPut
+      parameters:
+        - name: id
+          in: path
+          description: id del usuario a modificar
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: actualiza el usuario correspondiente al id segun la informacion dada aqui
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '200':
+          description: actualizacion exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+      security:
+        - api_key: []
+    delete:
+      tags: 
+        - Usuarios
+      summary: Elimina un usuario por su id
+      description: Obtener ID's de la ruta get '/usuarios'
+      operationId: usuariosDelete
+      parameters:
+        - name: id
+          in: path
+          description: ID del usuario a eliminar
+          required: true
+          schema: 
+            type: string
+      responses:
+        - '200':
+            description: Usuario eliminado correctamente
+      security:
+        - api_key: []
+  /usuarios:
+    get:
+      tags: 
+        - Usuarios
+      summary: Obtiene un listado de todos los usuarios en una simple peticion.
+      description: Solo entrega nombre y uid, para mas informacion sobre un usuario consultar en la ruta 'usuarios/{id}'
+      operationId: usuariosGet
+      parameters:
+        - name: limite
+          in: query
+          description: la cantidad de usuarios a mostrar
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 3
+      responses:
+        '200':
+          description: operacion exitosa
+          content:
+            application/json: 
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuariosArray'
+      security:
+        - api_key: []
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login
+      description: Inicia sesion con tus credenciales y obten un token
+      operationId: login
+      requestBody:
+        description: Usuario y contraseña
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioLogin'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'          
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+components:
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        nombre:
+          type: string
+          example: Felipe
+        correo:
+          type: string
+          format: email
+          example: test1@test.com
+        password:
+          type: string
+          minlength: 6
+        img:
+          type: string
+        rol:
+          type: string
+          enum: [ADMIN_ROLE, USER_ROLE, SUPER_ROLE, VENTAS_ROLE]
+        estado:
+          type: boolean
+        google:
+          type: boolean
+      required:
+        - correo
+        - password
+    UsuariosArray:
+      type: object
+      properties:
+        nombre:
+          type: string
+          example: Daniel
+        uid:
+          type: string
+          example: 13HNO2I345BUOO123
+    UsuarioLogin:
+      type: object
+      properties:
+        correo:
+          type: string
+          example: testuser@email.com
+        password:
+          type: string
+          example: 1234567890abc
+    Token:
+      type: object
+      properties:
+        usuario:
+          $ref: '#/components/schemas/Usuario'
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NjNkMDE5OTUxN2kNjhlMTVmZjIiLCJpaFHtrfYXQiOjE3MTc3Nzc0OTksImV4cCI6MTcxNzc5MTg5OX0.EwcG8vCY_7n6XMQj0A8G1zVGH1yh7v5Ubu75jOXayGE
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: x-token
+      in: header
