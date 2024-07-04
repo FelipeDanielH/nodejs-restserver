@@ -2,7 +2,7 @@ const { response } = require("express")
 
 const esAdminRole = (req, res = response, next) => {
 
-    // Verifica que el 
+    // Verifica que el usuario tenga el rol 'ADMIN_ROLE' en la bd
     if (!req.usuario) {
         return res.status(500).json({
             msg: 'Rol no valido - token not found'
@@ -22,7 +22,6 @@ const esAdminRole = (req, res = response, next) => {
 
 const tieneRole = (...roles) => {
     return (req, res = response, next) => {
-
 
         if (!req.usuario) {
             return res.status(500).json({
