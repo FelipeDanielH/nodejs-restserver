@@ -34,11 +34,18 @@ servers:
   - url: http://localhost:8080/api
 tags:
   - name: Usuarios
-    description: operaciones crud con usuarios (limitado al rol)
+    description: CRUD usuarios (limitado al rol)
   - name: Auth
     description: Login simple
+  - name: Categorias
+    description: CRUD categorias
+  - name: Productos
+    description: CRUD productos
+  - name: Buscar
+    description: Funcion de buscar en':' productos, categorias y usuarios
 paths:
   /usuarios/{id}:
+  # Users - Get One
     get:
       tags:
         - Usuarios
@@ -58,13 +65,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario' 
+                $ref: '#/components/schemas/Usuario'
         '400':
           description: Invalid username supplied
         '404':
           description: User not found
       security:
         - api_key: []
+  # Users - Update
     put:
       tags:
         - Usuarios
@@ -93,6 +101,7 @@ paths:
                 $ref: '#/components/schemas/Usuario'
       security:
         - api_key: []
+  # Users - Delete
     delete:
       tags: 
         - Usuarios
@@ -112,6 +121,7 @@ paths:
       security:
         - api_key: []
   /usuarios:
+  # Users - Get All
     get:
       tags: 
         - Usuarios
@@ -139,6 +149,7 @@ paths:
       security:
         - api_key: []
   /auth/login:
+  # Auth - Login
     post:
       tags:
         - Auth
@@ -158,13 +169,285 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Token'          
+                $ref: '#/components/schemas/Token'
         '400':
           description: Invalid input
         '422':
           description: Validation exception
+  /categorias/{id}:
+  # Categories -  Get One 
+    get:
+      tags:
+        - Categorias
+      summary: Muestra la categoria con el id pasado por parametro
+      description: solo requiere token. Accesible para cualquier tipo de usuario
+      operationId: obtenerCategoria
+      parameters:
+        - name: id
+          in: path
+          description: 'id de la categoria'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: succesful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '404':
+          description: categoria no encontrada
+  # Categories - Update
+    put:
+      tags:
+        - Categorias
+      summary: Actualiza una categoria
+      description: Actualiza una categoria con el id (mongo objectId) pasado por la ruta
+      operationId: actualizarCategoria
+      parameters:
+        - name: id
+          in: path
+          description: id de la categoria a actualizar
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Actualiza una categoria
+        content: 
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaUpdate'
+      responses:
+        default: 
+          description: operacion exitosa
+      security:
+        - api_key: []
+  # Categories - Delete
+    delete:
+      tags:
+        - Categorias
+      summary: Elimina una categoria
+      description: Elimina la categoria con el id pasado por parametro
+      operationId: eliminarCategoria
+      parameters:
+        - name: id
+          in: path
+          description: id de la categoria que se va a eliminar
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Categoria eliminada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria/'
+      security:
+        - api_key: []
+  /categorias:
+  # Categories - Get All
+    get:
+      tags:
+        - Categorias
+      summary: Muestra todas las categorias de la base de Datos
+      description: Token requerido
+      operationId: obetnerCategorias
+      parameters:
+        - name: limite
+          in: query
+          description: la cantidad de categorias a mostrar
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 3
+      responses:
+        '200':
+          description: operacion exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoriasArray'
+        '404':
+          description: no se encontro categoria
+  # Categories - Create
+    post:
+      tags:
+        - Categorias
+      summary: Crea una categoria
+      description: Crea una categoria a partir de un objeto JSON
+      operatioId: crearCategoria
+      requestBody:
+        description: datos de la categoria
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+      responses:
+        '200':
+          description: Operacion exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Datos no Validos
+      security:
+        - api_key: []
+  # Product - Get All
+  /productos:
+    get:
+      tags:
+        - Productos
+      summary: Retorna todos los productos
+      description: Esta ruta no requiere token de acceso
+      operationId: obtenerProductos
+      parameters:
+        - name: limite
+          in: query
+          description: la cantidad de productos que se mostraran
+          required: false
+          schema:
+            type: integer
+            format: int64
+            default: 3
+      responses:
+        '200':
+          description: operacion exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductosArray'
+  # Product - Create
+    post:
+      tags:
+        - Productos
+      summary: Crea un producto
+      description: recibe un objeto en el body para crear el producto
+      operationId: crearProducto
+      requestBody:
+        description: datos del producto
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/requestBodies/ProductoCreate'
+  # Product - Get One
+  /productos/{id}:
+    get:
+      tags:
+        - Productos
+      summary: Retorna un producto
+      description: Entrega la informacion de un producto pasado por el path
+      operationId: obtenerProducto
+      parameters:
+        - name: id
+          in: path
+          description: el id del producto a mostrar
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: operacion exitosa
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+  # Product - Update
+    put:
+      tags:
+        - Productos
+      summary: actualiza un producto
+      description: Actualiza el producto entregado por ruta
+      operationId: actualizaProducto
+      parameters:
+        - name: id
+          in: path
+          description: el id del producto a actualizar
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/ProductoUpdate'
+      responses:
+        '200':
+          description: operacion exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+      security:
+        - api_key: []
+  # Product - Delete
+    delete:
+      tags:
+        - Productos
+      summary: elimina un producto
+      description: se debe entregar un id del producto a eliminar en la ruta
+      operationId: borrarProducto
+      parameters:
+        - name: id
+          in: path
+          description: id del producto a eliminar
+          required: true
+          schema:
+            type: string
+      responses:
+        - '200':
+            description: Operacion Exitosa
+      security:
+        - api_key: []
+  # TODO unfinished
+  # Buscar
+  /buscar/{coleccion}/{termino}:
+    get:
+      tags:
+        - Buscar
+      summary: busca un producto dentro de una coleccion
+      description: Las colecciones pueden ser Categorias, Productos o Usuarios
+      operationId: buscar
+      parameters:
+        - name: coleccion
+          in: path
+          description: nombre de la coleccion a buscar
+          required: true
+          schema:
+            type: string
+            example: usuario
+        - name: termino
+          in: path
+          description: termino a utilizar como criterio de busqueda
+          required: true
+          schema: 
+            type: string
+            example: testuser
+      responses:
+        '200':
+          description: operacion exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/busquedaComponent'
+############################ COMPONENTES #############################
 components:
+  busquedaComponent:
+    allOf:
+      - $ref: '#/components/schermas/UsuariosArray'
+      - $ref: '#/components/schemas/CategoriasArray'
+      - $ref: '#/components/schemas/ProductosArray'
   schemas:
+    # Schema usuario
     Usuario:
       type: object
       properties:
@@ -208,14 +491,123 @@ components:
         password:
           type: string
           example: 1234567890abc
+    # Schema Token
     Token:
       type: object
       properties:
         usuario:
-          $ref: '#/components/schemas/Usuario'
+          type: string
         token:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI2NjNkMDE5OTUxN2kNjhlMTVmZjIiLCJpaFHtrfYXQiOjE3MTc3Nzc0OTksImV4cCI6MTcxNzc5MTg5OX0.EwcG8vCY_7n6XMQj0A8G1zVGH1yh7v5Ubu75jOXayGE
+    # Schema categoria
+    Categoria:
+      type: object
+      properties:
+        nombre:
+          type: string
+        estado:
+          type: boolean
+        usuario:
+          type: string
+      required:
+        - nombre
+        - estado
+        - usuario
+    CategoriasArray:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 66858e66573dacf98ae9cey9
+        nombre:
+          type: string
+          example: GALLETA
+        usuario:
+          type: object
+          properties:
+            _id:
+              type: string
+            nombre: 
+              type: string
+    CategoriaUpdate:
+      type: object
+      properties:
+        nombre: 
+          type: string
+    # Schema productos
+    Producto:
+      type: object
+      properties:
+        nombre:
+          type: string
+        estado:
+          type: boolean
+        usuario: 
+          type: string
+        Categoria:
+          type: string
+        precio:
+          type: number
+        descripcion:
+          type: string
+        disponible:
+          type: boolean
+    ProductosArray:
+      type: object
+      properties:
+        _id: 
+          type: string
+          example: 86ab7532dd4cff1e71dc9ct5
+        nombre:
+          type: string
+          example: GALLLETA1
+        usuario:
+          type: string
+          example: 663d0199517ffaad68e05fei
+        categoria:
+          type: object
+          properties:
+            _id:
+              type: string
+              example: 669a9f95a549dh726a24016o
+        precio:
+          type: integer
+          format: int64
+          example: 100
+        descripcion:
+          type: string
+          example: "galletas de chocolate"
+        disponible:
+          type: boolean
+          example: true
+  requestBodies:
+    ProductoCreate:
+      description: producto generico
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nombre:
+                type: string
+              categoria:
+                type: string
+              precio:
+                type: integer
+                format: int64
+              descripcion:
+                type: string
+    ProductoUpdate:
+            description: nombre del producto
+            required: true
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    nombre:
+                      type: string
   securitySchemes:
     api_key:
       type: apiKey

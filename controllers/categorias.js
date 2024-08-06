@@ -20,7 +20,6 @@ const obtenerCategorias = async (req, res = response) => {
         res.status(200).json({total,categorias});
     } catch (error) {
         res.status(400).json({msg: "error en las categorias"});
-        
     }
 }
 

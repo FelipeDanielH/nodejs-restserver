@@ -21,19 +21,18 @@ router.get('/:id', [
 router.post('/', [
     validarJWT,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('categoria', 'No es un id de Mongo').isMongoId(), 
-    check('categoria').custom( validarCategoria ), 
+    check('categoria', 'No es un id de Mongo').isMongoId(),
+    check('categoria').custom( validarCategoria ),
     validarCampos
-], crearProducto);
+], crearProducto );
 
-// TODO: agregar funcion de actualizar producto  
+
 router.put('/:id', [
-    validarJWT, 
-    check('id').custom( existeProductoPorId ), 
+    validarJWT,
+    check('id').custom( existeProductoPorId ),
     validarCampos
 ], actualizarProducto )
 
-// TODO: agregar funcion de eliminar producto  
 router.delete('/:id', [
     validarJWT,
     esAdminRole,
