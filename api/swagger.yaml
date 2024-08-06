@@ -424,14 +424,14 @@ paths:
           required: true
           schema:
             type: string
-            example: usuario
+            example: categorias
         - name: termino
           in: path
           description: termino a utilizar como criterio de busqueda
           required: true
           schema: 
             type: string
-            example: testuser
+            example: galleta
       responses:
         '200':
           description: operacion exitosa
@@ -443,7 +443,7 @@ paths:
 components:
   busquedaComponent:
     allOf:
-      - $ref: '#/components/schermas/UsuariosArray'
+      - $ref: '#/components/schemas/UsuariosArray'
       - $ref: '#/components/schemas/CategoriasArray'
       - $ref: '#/components/schemas/ProductosArray'
   schemas:
