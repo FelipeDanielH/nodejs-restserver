@@ -408,7 +408,6 @@ paths:
             description: Operacion Exitosa
       security:
         - api_key: []
-  # TODO unfinished
   # Buscar
   /buscar/{coleccion}/{termino}:
     get:
