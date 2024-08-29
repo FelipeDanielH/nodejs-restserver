@@ -30,9 +30,27 @@ const existeProductoPorId = async(id) => {
     }
 }
 
+/**
+ * Validar colecciones permitidas en la ruta de actualizar archivo
+ * -----------------------
+ * colecion: la extension .txt o .png que se va a enviar
+ * colecciones: el arrego de colecciones permitidas
+ */
+const coleccionesPermitidas = ( coleccion ='', colecciones = [] ) => {
+    const incluida = colecciones.includes( coleccion );
+    if( !incluida ) {
+        throw new Error(`La coleccion '${coleccion}' no es permitida, colecciones permitidas: (${colecciones})`);
+    }
+
+    // se retorna true porque la aplicacion de esta funcion esta dentro de otra funcion
+    return true;
+}
+
+
 module.exports = {
     esRolValido,
     emailExiste,
     existeUsuarioPorId,
-    existeProductoPorId
+    existeProductoPorId,
+    coleccionesPermitidas
 }
