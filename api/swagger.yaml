@@ -11,7 +11,7 @@ info:
 
     ```json
     {
-      "nombre":"usuariotest@test.com"
+      "nombre":"usuariotest@test.com",
       "password":"simpletest"
     }
     ```
@@ -43,13 +43,15 @@ tags:
     description: CRUD productos
   - name: Buscar
     description: Funcion de buscar en':' productos, categorias y usuarios
+  - name: Uploads
+    description: subir archivos en formato png
 paths:
   /usuarios/{id}:
   # Users - Get One
     get:
       tags:
         - Usuarios
-      summary: Obtiene informacion del usuario con su id
+      summary: Obtiene in1ormacion del usuario con su id
       description: solo accesible si el usuario esta logeado
       operationId: usuarioGet
       parameters:
@@ -253,7 +255,7 @@ paths:
         - Categorias
       summary: Muestra todas las categorias de la base de Datos
       description: Token requerido
-      operationId: obetnerCategorias
+      operationId: obtenerCategorias
       parameters:
         - name: limite
           in: query
@@ -335,12 +337,15 @@ paths:
       description: recibe un objeto en el body para crear el producto
       operationId: crearProducto
       requestBody:
-        description: datos del producto
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/requestBodies/ProductoCreate'
-  # Product - Get One
+        $ref: '#/components/requestBodies/ProductoCreate'
+      responses:
+        '200':
+          description: Operacion exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+    # Product - Get One
   /productos/{id}:
     get:
       tags:
@@ -413,7 +418,7 @@ paths:
     get:
       tags:
         - Buscar
-      summary: busca un producto dentro de una coleccion
+      summary: busca en las colecciones de Productos, Categorías o Usuarioskkkrf
       description: Las colecciones pueden ser Categorias, Productos o Usuarios
       operationId: buscar
       parameters:
@@ -438,10 +443,123 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/busquedaComponent'
+  # Actualizar Imagen
+  /uploads/{coleccion}/{id}:
+    put:
+      tags:
+        - Uploads
+      summary: actualiza una imagen existente
+      description: se deben respetar los formatos compatibles
+      operationId: actualizarImagenCloudinary
+      parameters:
+        - name: coleccion
+          in: path
+          description: nombre de la coleccion
+          required: true
+          schema:
+            type: string
+            example: categorias
+        - name: id
+          in: path
+          description: id de la imagen a actualizar 
+          required: true
+          schema:
+            type: string
+            example: 66ab7532dd4cff1e71dc8cd5
+      requestBody:
+        description: datos de la imagen o la imagen
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                archivo:
+                  type: string
+                  format: binary
+            encoding:
+              archivo: image/jpeg, image/png
+      responses:
+        '200':
+          description: Operacion exitosa
+          content:
+            application/json: 
+              schema: 
+                $ref: '#/components/actualizacionComponent'
+      security:
+        - api_key: []
+  # Mostrar Imagen
+    get:
+      tags:
+        - Uploads
+      summary: muestra la imagen del producto/categoria
+      description: es necesario indicar id y categoria en el path
+      operationId: buscar
+      parameters:
+        - name: coleccion
+          in: path
+          description: nombre de la coleccion
+          required: true
+          schema:
+            type: string
+            example: categorias
+        - name: id
+          in: path
+          description: id del producto del que se mostrara la imagen
+          required: true
+          schema:
+            type: string
+            example: 66ab7532dd4cff1e71dc8cd5
+      responses:
+        '200':
+          description: Operacion exitosa
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+  # Subir
+  /uploads:
+    post:
+      tags:
+        - Uploads
+      summary: subir un archivo
+      description: "formatos permitidos: jpeg, png"
+      operationId: cargarArchivo
+      requestBody:
+        description: imagen a subir
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                archivo:
+                  type: string
+                  format: binary
+            encoding:
+              archivo:
+                contentType: image/jpeg, image/png
+      responses:
+        '200':
+          description: Operacion exitosa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombre:
+                    type: string
+                    description: nombre del archivo
+      security:
+        - api_key: []
 ############################ COMPONENTES #############################
 components:
   busquedaComponent:
-    allOf:
+    oneOf:
+      - $ref: '#/components/schemas/UsuariosArray'
+      - $ref: '#/components/schemas/CategoriasArray'
+      - $ref: '#/components/schemas/ProductosArray'
+  actualizacionComponent:
+    oneOf:       
       - $ref: '#/components/schemas/UsuariosArray'
       - $ref: '#/components/schemas/CategoriasArray'
       - $ref: '#/components/schemas/ProductosArray'
@@ -583,6 +701,7 @@ components:
   requestBodies:
     ProductoCreate:
       description: producto generico
+      required: true
       content:
         application/json:
           schema:
@@ -598,15 +717,22 @@ components:
               descripcion:
                 type: string
     ProductoUpdate:
-            description: nombre del producto
-            required: true
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    nombre:
-                      type: string
+      description: nombre del producto
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nombre:
+              type: string
+    ImageUpload:
+      description: imagen
+      required: true
+      content:
+        application/json:
+          schema:
+            
   securitySchemes:
     api_key:
       type: apiKey
