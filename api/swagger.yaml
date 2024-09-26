@@ -11,7 +11,7 @@ info:
 
     ```json
     {
-      "nombre":"usuariotest@test.com"
+      "nombre":"usuariotest@test.com",
       "password":"simpletest"
     }
     ```
@@ -255,7 +255,7 @@ paths:
         - Categorias
       summary: Muestra todas las categorias de la base de Datos
       description: Token requerido
-      operationId: obetnerCategorias
+      operationId: obtenerCategorias
       parameters:
         - name: limite
           in: query
@@ -418,7 +418,7 @@ paths:
     get:
       tags:
         - Buscar
-      summary: busca un producto dentro de una coleccion
+      summary: busca en las colecciones de Productos, Categorías o Usuarioskkkrf
       description: Las colecciones pueden ser Categorias, Productos o Usuarios
       operationId: buscar
       parameters:
